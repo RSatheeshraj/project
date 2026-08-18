@@ -1,6 +1,6 @@
 const { By, until } = require('selenium-webdriver');
 
-// Discovered routes in AmbiEye codebase
+// Discovered routes in PoultryGuard codebase
 const ROUTES = {
   login: '/login',
   register: '/register',

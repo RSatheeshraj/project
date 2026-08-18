@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 function discoverCodebase() {
-  console.log('Scanning AmbiEye codebase for real routes, components, and endpoints...');
+  console.log('Scanning PoultryGuard codebase for real routes, components, and endpoints...');
   
   const appDir = path.join(__dirname, '../src/app');
   const routes = [];
@@ -60,7 +60,7 @@ function discoverCodebase() {
   scanAppDir(appDir);
 
   const inventory = {
-    application: "AmbiEye (PoultryGuard Lite)",
+    application: "PoultryGuard Lite",
     scannedAt: new Date().toISOString(),
     routes,
     apiEndpoints

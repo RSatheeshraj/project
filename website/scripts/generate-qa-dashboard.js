@@ -22,7 +22,7 @@ function generateGitHubJobSummary(executionReport) {
     p99: 0
   };
 
-  const md = `# AmbiEye Test Execution Dashboard
+  const md = `# PoultryGuard Test Execution Dashboard
 
 ## 📈 Overall Metrics
 

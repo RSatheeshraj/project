@@ -4,7 +4,7 @@ const fs = require('fs');
 
 async function generateMasterExcelReport(reportData, outputPath) {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = 'AmbiEye Automated QA Engine';
+  workbook.creator = 'PoultryGuard Automated QA Engine';
   workbook.created = new Date();
 
   // Color Styles
@@ -249,7 +249,7 @@ async function generateMasterExcelReport(reportData, outputPath) {
     envSheet.addRow({ property: key, value: String(envData[key]) });
   });
 
-  const finalPath = outputPath || path.join(__dirname, '../../reports/AmbiEye_Test_Execution_Report.xlsx');
+  const finalPath = outputPath || path.join(__dirname, '../../reports/PoultryGuard_Test_Execution_Report.xlsx');
   const dir = path.dirname(finalPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });

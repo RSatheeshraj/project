@@ -1,4 +1,4 @@
-name: AmbiEye Automated Master QA Pipeline
+name: PoultryGuard Automated Master QA Pipeline
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   qa-pipeline:
-    name: AmbiEye Execution-Based QA Framework
+    name: PoultryGuard Execution-Based QA Framework
     runs-on: ubuntu-latest
 
     env:
@@ -17,6 +17,12 @@ jobs:
       HEADLESS: "true"
       TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
       TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      NEXT_PUBLIC_FIREBASE_API_KEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCUsKqEa2xlGlfCHY0MQVAGca58y7mAsSU' }}
+      NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'poultryguardlite.firebaseapp.com' }}
+      NEXT_PUBLIC_FIREBASE_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'poultryguardlite' }}
+      NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'poultryguardlite.firebasestorage.app' }}
+      NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1013031899395' }}
+      NEXT_PUBLIC_FIREBASE_APP_ID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1013031899395:web:4eb9d406fa42f6f9ca1936' }}
 
     steps:
       - name: Checkout Source Code
@@ -83,14 +89,14 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AmbiEye_Test_Execution_Report
-          path: website/reports/AmbiEye_Test_Execution_Report.xlsx
+          name: PoultryGuard_Test_Execution_Report
+          path: website/reports/PoultryGuard_Test_Execution_Report.xlsx
 
       - name: Upload Test Screenshots & Logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: AmbiEye_Test_Logs_And_Screenshots
+          name: PoultryGuard_Test_Logs_And_Screenshots
           path: |
             website/reports/screenshots/
             website/reports/execution-log.json

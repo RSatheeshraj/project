@@ -13,7 +13,7 @@ function sendSingleRequest(targetUrl) {
         port: parsedUrl.port || 80,
         path: `${parsedUrl.pathname}${parsedUrl.search}`,
         method: 'GET',
-        headers: { 'User-Agent': 'AmbiEye-LoadTester/1.0' },
+        headers: { 'User-Agent': 'PoultryGuard-LoadTester/1.0' },
         timeout: 5000
       };
 

@@ -14,7 +14,7 @@ async function runMasterQaPipeline() {
   const startMs = Date.now();
 
   console.log('====================================================');
-  console.log('STARTING AMBIEYE COMPREHENSIVE MASTER QA PIPELINE');
+  console.log('STARTING POULTRYGUARD COMPREHENSIVE MASTER QA PIPELINE');
   console.log('====================================================');
 
   // Step 1: Codebase Discovery
@@ -60,7 +60,7 @@ async function runMasterQaPipeline() {
   };
 
   // Step 7: Generate Excel Report
-  const excelPath = path.join(__dirname, '../reports/AmbiEye_Test_Execution_Report.xlsx');
+  const excelPath = path.join(__dirname, '../reports/PoultryGuard_Test_Execution_Report.xlsx');
   await generateMasterExcelReport(fullReport, excelPath);
 
   // Step 8: Generate GitHub Actions Job Summary
@@ -71,7 +71,7 @@ async function runMasterQaPipeline() {
   fs.writeFileSync(logPath, JSON.stringify(fullReport, null, 2), 'utf8');
 
   console.log('\n====================================================');
-  console.log('AMBIEYE MASTER QA PIPELINE COMPLETE');
+  console.log('POULTRYGUARD MASTER QA PIPELINE COMPLETE');
   console.log('====================================================');
   console.log(`Excel Report: ${excelPath}`);
   console.log(`Execution Log: ${logPath}`);
