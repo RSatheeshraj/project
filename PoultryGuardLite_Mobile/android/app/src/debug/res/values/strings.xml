@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Hardcoded debug token for local emulator development to avoid copying from logcat -->
+    <string name="firebase_app_check_debug_token" translatable="false">188544D7-22E4-4273-90CC-3A7F3101E935</string>
+</resources>

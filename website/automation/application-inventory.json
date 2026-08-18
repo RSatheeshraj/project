@@ -1,0 +1,95 @@
+{
+  "application": "AmbiEye (PoultryGuard Lite)",
+  "scannedAt": "2026-08-18T17:09:58.407Z",
+  "routes": [
+    {
+      "path": "/login",
+      "filePath": "src\\app\\(auth)\\login\\page.tsx",
+      "authRequired": false
+    },
+    {
+      "path": "/register",
+      "filePath": "src\\app\\(auth)\\register\\page.tsx",
+      "authRequired": false
+    },
+    {
+      "path": "/directory",
+      "filePath": "src\\app\\(dashboard)\\directory\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/farms",
+      "filePath": "src\\app\\(dashboard)\\farms\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/farms/[farmId]/batches/[batchId]",
+      "filePath": "src\\app\\(dashboard)\\farms\\[farmId]\\batches\\[batchId]\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/farms/[farmId]",
+      "filePath": "src\\app\\(dashboard)\\farms\\[farmId]\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/history",
+      "filePath": "src\\app\\(dashboard)\\history\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/history/[scanId]",
+      "filePath": "src\\app\\(dashboard)\\history\\[scanId]\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/home",
+      "filePath": "src\\app\\(dashboard)\\home\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/profile",
+      "filePath": "src\\app\\(dashboard)\\profile\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/reminders",
+      "filePath": "src\\app\\(dashboard)\\reminders\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/sales",
+      "filePath": "src\\app\\(dashboard)\\sales\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/scan",
+      "filePath": "src\\app\\(dashboard)\\scan\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/settings",
+      "filePath": "src\\app\\(dashboard)\\settings\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/welcome",
+      "filePath": "src\\app\\(dashboard)\\welcome\\page.tsx",
+      "authRequired": true
+    },
+    {
+      "path": "/",
+      "filePath": "src\\app\\page.tsx",
+      "authRequired": false
+    }
+  ],
+  "apiEndpoints": [
+    {
+      "path": "/api/ai-scan",
+      "methods": [
+        "POST"
+      ],
+      "filePath": "src\\app\\api\\ai-scan\\route.ts"
+    }
+  ]
+}

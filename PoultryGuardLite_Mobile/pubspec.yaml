@@ -1,0 +1,83 @@
+name: poultryguardlite
+description: "PoultryGuard Lite — AI-powered poultry health monitoring."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.2.0
+
+  # Navigation
+  go_router: ^17.3.0
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+
+  # Firebase
+  firebase_core: ^4.12.1
+  firebase_auth: ^6.5.6
+  cloud_firestore: ^6.7.1
+  google_sign_in: ^6.2.2
+  # AI — firebase_ai is the official replacement for the deprecated google_generative_ai package.
+  # It uses Firebase App Check for security and supports the latest Gemini models.
+  firebase_ai: ^3.14.1
+
+  # App Check — validates that requests come from legitimate app instances.
+  # Debug provider is used on emulators/debug builds; Play Integrity for release.
+  firebase_app_check: ^0.4.5+2
+
+  # Image
+  image_picker: ^1.1.2
+
+  # Local Storage
+  shared_preferences: ^2.3.3
+  intl: ^0.20.3
+  fl_chart: ^1.2.0
+  url_launcher: ^6.3.2
+  pdf: ^3.13.0
+  printing: ^5.15.0
+  package_info_plus: ^8.0.0
+  path_provider: ^2.1.6
+  win32: ^5.15.0
+  file: ^7.0.1
+  platform: ^3.1.6
+  url_launcher_android: ^6.3.32
+  http: ^1.6.0
+  firebase_storage: ^13.4.6
+  table_calendar: ^3.2.1
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.2
+  flutter_native_splash: ^2.4.4
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/branding/poultryguard_logo.png" # Legacy fallback
+  adaptive_icon_background: "#0c150f" # Very dark green for contrast
+  adaptive_icon_foreground: "assets/branding/launcher_foreground.png"
+  min_sdk_android: 23
+
+flutter_native_splash:
+  color: "#161917" # AppColors.surface (a dark color)
+  image: "assets/branding/stacked_logo.png"
+  android: true
+  ios: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/branding/
+    - assets/images/
+    - assets/icons/
+    - assets/lottie/
+    - assets/fonts/

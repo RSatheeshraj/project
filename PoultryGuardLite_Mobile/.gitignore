@@ -1,0 +1,51 @@
+# Node Dependencies
+node_modules/
+**/node_modules/
+
+# Flutter / Dart Generated Files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Android Specific
+android/.gradle/
+android/captures/
+android/app/build/
+android/app/upload-keystore.jks
+android/key.properties
+android/local.properties
+**/android/app/build/
+**/android/app/src/main/assets/
+
+# iOS Specific
+ios/.generated/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Flutter/app.flx
+ios/Flutter/app.zip
+ios/Flutter/flutter_assets/
+ios/Pods/
+ios/.symlinks/
+*.mode1v3
+*.mode2v3
+*.moved-aside
+*.pbxuser
+*.perspectivev3
+
+# Binaries & Distribution
+*.apk
+*.aab
+*.ipa
+
+# OS & IDE Junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp

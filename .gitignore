@@ -1,0 +1,77 @@
+# ==========================================
+# PoultryGuard Lite Root .gitignore
+# ==========================================
+
+# Node / Dependencies everywhere
+node_modules/
+**/node_modules/
+.pnp/
+.pnp.*
+
+# Operating System & IDE Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.sublime-workspace
+*.swp
+*.swo
+
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.jks
+*.keystore
+key.properties
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+logs/
+*.tmp
+*.bak
+
+# Next.js / Web Build & Cache Artifacts
+website/.next/
+website/out/
+website/build/
+website/reports/*.xlsx
+website/reports/*.json
+website/reports/job-summary.md
+website/reports/screenshots/
+website/*.tsbuildinfo
+
+# Flutter / Dart Build & Dependency Artifacts
+PoultryGuardLite_Mobile/.dart_tool/
+PoultryGuardLite_Mobile/.flutter-plugins
+PoultryGuardLite_Mobile/.flutter-plugins-dependencies
+PoultryGuardLite_Mobile/build/
+PoultryGuardLite_Mobile/android/.gradle/
+PoultryGuardLite_Mobile/android/app/build/
+PoultryGuardLite_Mobile/android/local.properties
+PoultryGuardLite_Mobile/ios/Pods/
+PoultryGuardLite_Mobile/ios/.symlinks/
+PoultryGuardLite_Mobile/ios/Flutter/Flutter.framework
+PoultryGuardLite_Mobile/ios/Flutter/Flutter.podspec
+PoultryGuardLite_Mobile/pubspec.lock
+
+# Standalone App Packages & Binaries
+*.apk
+*.aab
+*.ipa
+*.exe

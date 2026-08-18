@@ -1,0 +1,51 @@
+{
+  "application": "PoultryGuardLite Mobile",
+  "techStack": {
+    "framework": "Flutter 3 (Dart)",
+    "architecture": "Clean Architecture / Feature-First",
+    "auth": "Firebase Auth",
+    "database": "Cloud Firestore"
+  },
+  "screens": [
+    {
+      "name": "LoginScreen",
+      "feature": "auth",
+      "widgets": ["EmailTextField", "PasswordTextField", "LoginButton", "RegisterLink"]
+    },
+    {
+      "name": "RegisterScreen",
+      "feature": "auth",
+      "widgets": ["NameTextField", "EmailTextField", "PasswordTextField", "RoleDropdown", "SignUpButton"]
+    },
+    {
+      "name": "HomeScreen",
+      "feature": "dashboard",
+      "widgets": ["FlockSummaryCard", "RecentActivityList", "QuickLogButton", "ScanFAB"]
+    },
+    {
+      "name": "FlockScreen",
+      "feature": "flock",
+      "widgets": ["BatchListTile", "AddBatchButton", "LogDailyEntryForm"]
+    },
+    {
+      "name": "ScanScreen",
+      "feature": "scan",
+      "widgets": ["CameraButton", "GalleryPickerButton", "AnalyzeButton", "DiagnosticResultsCard"]
+    },
+    {
+      "name": "HistoryScreen",
+      "feature": "history",
+      "widgets": ["ScanHistoryList", "DateFilterChip", "SearchField"]
+    },
+    {
+      "name": "VetScreen",
+      "feature": "vet",
+      "widgets": ["VetCard", "CallButton", "LocationFilter"]
+    },
+    {
+      "name": "ProfileScreen",
+      "feature": "profile",
+      "widgets": ["UserProfileHeader", "EditProfileButton", "SignOutButton"]
+    }
+  ]
+}

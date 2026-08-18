@@ -1,0 +1,134 @@
+@import "tailwindcss";
+
+/**
+ * PoultryGuardLite Design System
+ * Colors sourced from Flutter's AppColors (app/theme/app_colors.dart)
+ *
+ * Primary   — Amber Gold      #F4A900
+ * Secondary — Forest Green    #2E7D32
+ * Surface   — Dark            #121212
+ */
+
+/* ── CSS Custom Properties (always dark — matches Flutter's dark theme) ─── */
+:root {
+  /* Brand */
+  --primary:            244 169 0;    /* #F4A900 — Amber Gold */
+  --primary-foreground: 26  18  0;    /* #1A1200 */
+  --secondary:          46  125 50;   /* #2E7D32 — Forest Green */
+  --secondary-foreground: 255 255 255;
+
+  /* Surface */
+  --background:         18  18  18;   /* #121212 */
+  --foreground:         245 240 232;  /* #F5F0E8 */
+  --card:               30  30  30;   /* #1E1E1E */
+  --card-foreground:    245 240 232;
+  --popover:            30  30  30;
+  --popover-foreground: 245 240 232;
+
+  /* Muted */
+  --muted:              42  42  42;   /* #2A2A2A */
+  --muted-foreground:   161 161 161;
+
+  /* Accent */
+  --accent:             50  50  50;   /* #323232 */
+  --accent-foreground:  245 240 232;
+
+  /* Semantic */
+  --destructive:        183 28  28;   /* #B71C1C — Deep Red */
+  --destructive-foreground: 255 255 255;
+  --border:             74  59  16;   /* #4A3B10 */
+  --input:              42  42  42;
+  --ring:               244 169 0;
+
+  /* Status colors */
+  --color-healthy:      #2E7D32;
+  --color-warning:      #F4A900;
+  --color-critical:     #B71C1C;
+  --color-unknown:      #757575;
+
+  /* Radius */
+  --radius: 0.75rem;
+}
+
+/* ── Tailwind v4 theme extension ─────────────────────────────────────────── */
+@theme inline {
+  --color-background:   rgb(var(--background));
+  --color-foreground:   rgb(var(--foreground));
+  --color-card:         rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-primary:      rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary:    rgb(var(--secondary));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-muted:        rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-accent:       rgb(var(--accent));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive:  rgb(var(--destructive));
+  --color-destructive-foreground: rgb(var(--destructive-foreground));
+  --color-border:       rgb(var(--border));
+  --color-input:        rgb(var(--input));
+  --color-ring:         rgb(var(--ring));
+  --color-popover:      rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+
+  --font-sans: var(--font-inter);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  border-color: rgb(var(--border));
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-family: var(--font-sans, system-ui, sans-serif);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgb(var(--background));
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--border));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--primary));
+}
+
+/* ── Focus ring ───────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid rgb(var(--ring));
+  outline-offset: 2px;
+}
+
+/* ── Utility: amber glow ─────────────────────────────────────────────────── */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(244, 169, 0, 0.25);
+}
+
+.glow-primary-lg {
+  box-shadow: 0 0 40px rgba(244, 169, 0, 0.35);
+}
+
+/* ── Glassmorphism card ───────────────────────────────────────────────────── */
+.glass {
+  background: rgba(30, 30, 30, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(244, 169, 0, 0.1);
+}

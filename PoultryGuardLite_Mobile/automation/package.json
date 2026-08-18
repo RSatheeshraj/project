@@ -1,0 +1,14 @@
+{
+  "name": "poultry-mobile-automation",
+  "version": "1.0.0",
+  "description": "Real Flutter Application Appium / WebdriverIO test suite",
+  "main": "runners/run-appium.js",
+  "scripts": {
+    "test": "node runners/run-appium.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
+    "webdriverio": "^8.40.0"
+  }
+}
