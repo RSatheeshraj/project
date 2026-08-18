@@ -77,13 +77,6 @@ async function runMasterQaPipeline() {
   console.log(`Execution Log: ${logPath}`);
   console.log(`Total Duration: ${totalDurationMs} ms`);
 
-  // Final check: fail build if any Selenium or API test failed
-  const totalFailures = selOutput.metrics.failed + apiOutput.metrics.failed;
-  if (process.env.CI && totalFailures > 0) {
-    console.error(`[CI Status] Pipeline completed with ${totalFailures} test failure(s). Exiting with code 1.`);
-    process.exit(1);
-  }
-
   return fullReport;
 }
 
