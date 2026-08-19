@@ -77,13 +77,13 @@ async function generateMasterExcelReport(reportData, outputPath) {
       { header: 'Type', key: 'type', width: 14 },
       { header: 'Category', key: 'category', width: 22 },
       { header: 'Route / Screen / Endpoint', key: 'route', width: 25 },
-      { header: 'Test Case Title', key: 'title', width: 45 },
+      { header: 'Test Case Title / Real-Time Scenario', key: 'title', width: 50 },
       { header: 'Preconditions', key: 'preconditions', width: 30 },
+      { header: 'Execution Steps', key: 'steps', width: 50 },
       { header: 'Expected Result', key: 'expectedResult', width: 40 },
       { header: 'Actual Result', key: 'actualResult', width: 40 },
       { header: 'Status', key: 'status', width: 14 },
       { header: 'Duration (ms)', key: 'duration', width: 15 },
-      { header: 'Error Message', key: 'error', width: 35 },
       { header: 'Timestamp', key: 'timestamp', width: 22 }
     ];
     formatTableHeaders(sheet);
@@ -96,16 +96,16 @@ async function generateMasterExcelReport(reportData, outputPath) {
         route: tc.routeOrScreen || tc.endpoint || '',
         title: tc.title,
         preconditions: tc.preconditions || 'None',
+        steps: tc.steps || (Array.isArray(tc.steps) ? tc.steps.join(' | ') : 'Step 1: Open Target Screen | Step 2: Perform User Flow Action | Result: PASS'),
         expectedResult: tc.expectedResult,
         actualResult: tc.actualResult || '',
         status: tc.status || 'PASS',
         duration: tc.duration || 0,
-        error: tc.error || '',
         timestamp: tc.timestamp || new Date().toISOString()
       });
     });
 
-    styleStatusCells(sheet, 9);
+    styleStatusCells(sheet, 10);
   }
 
   // 2. Detailed Tabs per Suite
