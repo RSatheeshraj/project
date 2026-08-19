@@ -9,7 +9,7 @@ on:
 
 jobs:
   qa-pipeline:
-    name: PoultryGuard Execution-Based QA Framework
+    name: PoultryGuard Execution-Based QA Framework (1,500 Total Test Cases)
     runs-on: ubuntu-latest
 
     env:
@@ -54,7 +54,7 @@ jobs:
           npm run start &
           npx wait-on http://127.0.0.1:3000 --timeout 60000
 
-      - name: Discover Codebase & Validate Exact Test Counts (300 E2E + 300 API)
+      - name: Discover Codebase & Validate Exact Test Counts (1,500 Total Test Cases - 300 per Suite)
         working-directory: website
         run: |
           npm run discover
@@ -65,34 +65,42 @@ jobs:
         working-directory: website
         run: npm run test:e2e
 
+      - name: Execute 300 Appium Mobile Tests
+        if: always()
+        working-directory: website
+        run: node tests/appium/appiumRunner.js
+
       - name: Execute 300 API Integration Tests
         if: always()
         working-directory: website
         run: npm run test:api
 
-      - name: Execute Load & Performance Testing
+      - name: Execute 300 Load & Performance Tests
         if: always()
         working-directory: website
         run: npm run test:load
 
-      - name: Execute Safe Defensive Security Validation
+      - name: Execute 300 Vulnerability & Security Validation Tests
         if: always()
         working-directory: website
         run: npm run test:security
 
-      - name: Generate Master Excel Report & GitHub Job Summary Dashboard
+      - name: Generate Master Excel Reports & GitHub Job Summary Dashboard (1,500 Test Cases)
         if: always()
         working-directory: website
         run: npm run test:all
 
-      - name: Upload Master Excel Report Artifact
+      - name: Upload Master Excel Report Artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: PoultryGuard_Test_Execution_Report
-          path: website/reports/PoultryGuard_Test_Execution_Report.xlsx
+          name: PoultryGuard_Master_Test_Execution_Reports
+          path: |
+            website/reports/PoultryGuard_Test_Execution_Report.xlsx
+            website/reports/AmbiEye_Test_Execution_Report.xlsx
+            PoultryGuardLite_Mobile/automation/reports/Mobile_Automation_Test_Report.xlsx
 
-      - name: Upload Test Screenshots & Logs
+      - name: Upload Test Screenshots & Execution Logs
         if: always()
         uses: actions/upload-artifact@v4
         with:
