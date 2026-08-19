@@ -154,7 +154,9 @@ async function generateMasterExcelReport(reportData, outputPath) {
   }
 
   await workbook.xlsx.writeFile(finalPath);
-  console.log(`[ExcelReporter] Master report successfully written to: ${finalPath}`);
+  const ambieyePath = path.join(dir, 'AmbiEye_Test_Execution_Report.xlsx');
+  await workbook.xlsx.writeFile(ambieyePath);
+  console.log(`[ExcelReporter] Master report successfully written to: ${finalPath} and ${ambieyePath}`);
   return finalPath;
 }
 
