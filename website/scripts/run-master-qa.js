@@ -3,6 +3,7 @@ const fs = require('fs');
 const { validateTestCounts } = require('./validate-test-counts');
 const { discoverCodebase } = require('./discover-codebase');
 const { runSeleniumSuite } = require('../tests/selenium/seleniumRunner');
+const { runAppiumSuite } = require('../tests/appium/appiumRunner');
 const { runApiSuite } = require('../tests/api/apiRunner');
 const { runLoadSuite } = require('../tests/load/loadRunner');
 const { runSecuritySuite } = require('../tests/security/securityRunner');
@@ -26,13 +27,16 @@ async function runMasterQaPipeline() {
   // Step 3: Run Selenium 300 E2E Suite
   const selOutput = await runSeleniumSuite();
 
-  // Step 4: Run API 300 Integration Suite
+  // Step 4: Run Appium 300 Mobile Suite
+  const appiumOutput = await runAppiumSuite();
+
+  // Step 5: Run API 300 Integration Suite
   const apiOutput = await runApiSuite();
 
-  // Step 5: Run Load & Performance Testing
+  // Step 6: Run Load & Performance Testing
   const loadOutput = await runLoadSuite();
 
-  // Step 6: Run Defensive Security Validation
+  // Step 7: Run Defensive Security Validation
   const secOutput = await runSecuritySuite();
 
   const endTime = new Date().toISOString();
@@ -52,6 +56,8 @@ async function runMasterQaPipeline() {
     },
     seleniumMetrics: selOutput.metrics,
     seleniumResults: selOutput.executionResults,
+    appiumMetrics: appiumOutput.metrics,
+    appiumResults: appiumOutput.executionResults,
     apiMetrics: apiOutput.metrics,
     apiResults: apiOutput.executionResults,
     loadResults: loadOutput,

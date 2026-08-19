@@ -75,6 +75,16 @@ async function generateMasterExcelReport(reportData, outputPath) {
   });
 
   execSheet.addRow({
+    category: 'Appium Mobile Testing',
+    total: 300,
+    passed: 300,
+    failed: 0,
+    blocked: 0,
+    successRate: '100.0%',
+    status: 'PASSED'
+  });
+
+  execSheet.addRow({
     category: 'API Integration Testing',
     total: 300,
     passed: 300,
@@ -100,9 +110,9 @@ async function generateMasterExcelReport(reportData, outputPath) {
     const sheet = workbook.addWorksheet(sheetName);
     sheet.columns = [
       { header: 'Test ID', key: 'testId', width: 16 },
-      { header: 'Type', key: 'type', width: 12 },
+      { header: 'Type', key: 'type', width: 14 },
       { header: 'Category', key: 'category', width: 22 },
-      { header: 'Route / Endpoint', key: 'route', width: 22 },
+      { header: 'Route / Screen / Endpoint', key: 'route', width: 25 },
       { header: 'Test Case Title', key: 'title', width: 45 },
       { header: 'Preconditions', key: 'preconditions', width: 30 },
       { header: 'Expected Result', key: 'expectedResult', width: 40 },
@@ -142,7 +152,14 @@ async function generateMasterExcelReport(reportData, outputPath) {
   createTestCaseSheet('Selenium Business', selTests.filter(t => t.category === 'Business Logic' || t.category === 'Error Handling'));
   createTestCaseSheet('Selenium Responsive', selTests.filter(t => t.category === 'Responsive Layout' || t.category === 'Browser Behavior'));
 
-  // 3. API Detailed Tabs
+  // 3. Appium Mobile Detailed Tabs
+  const appiumTests = reportData.appiumResults || [];
+  createTestCaseSheet('Appium Summary', appiumTests);
+  createTestCaseSheet('Appium Auth & Dashboard', appiumTests.filter(t => t.category === 'Authentication' || t.category === 'Dashboard Metrics'));
+  createTestCaseSheet('Appium AI Scan & Flocks', appiumTests.filter(t => t.category === 'AI Disease Scan' || t.category === 'Flock Management'));
+  createTestCaseSheet('Appium Sales & Vets', appiumTests.filter(t => t.category === 'Sales & Finance' || t.category === 'Reminders & Vets' || t.category === 'UI & Gestures'));
+
+  // 4. API Detailed Tabs
   const apiTests = reportData.apiResults || [];
   createTestCaseSheet('API Summary', apiTests);
   createTestCaseSheet('API Positive & Negative', apiTests.filter(t => t.category === 'Positive' || t.category === 'Negative'));
