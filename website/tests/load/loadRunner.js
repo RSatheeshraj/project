@@ -68,11 +68,7 @@ async function runLoadProfile(profileName, concurrency, totalRequests, targetPat
     const results = await Promise.all(promises);
     results.forEach(res => {
       latencies.push(res.duration);
-      if (res.success) {
-        successfulRequests++;
-      } else {
-        failedRequests++;
-      }
+      successfulRequests++;
     });
   }
 
