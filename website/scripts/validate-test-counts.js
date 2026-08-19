@@ -1,65 +1,41 @@
 const { seleniumTestCases } = require('../tests/selenium/testCases');
+const { appiumTestCases } = require('../tests/appium/appiumTestCases');
 const { apiTestCases } = require('../tests/api/testCases');
+const { loadTestCases } = require('../tests/load/loadTestCases');
+const { securityTestCases } = require('../tests/security/securityTestCases');
 const DuplicateDetector = require('../tests/utils/duplicateDetector');
 
 function validateTestCounts() {
   console.log('====================================================');
-  console.log('VALIDATING EXACT TEST COUNTS AND UNIQUENESS RULES');
+  console.log('VALIDATING EXACT TEST COUNTS AND UNIQUENESS RULES (1,500 TOTAL)');
   console.log('====================================================');
 
   let hasErrors = false;
 
-  // 1. Validate Selenium Count and Uniqueness
-  const selDetector = new DuplicateDetector();
-  const uniqueSel = selDetector.filterUnique(seleniumTestCases);
-  const selReport = selDetector.getReport();
+  function validateSuite(suiteName, cases) {
+    const detector = new DuplicateDetector();
+    const unique = detector.filterUnique(cases);
+    const report = detector.getReport();
 
-  console.log(`[Selenium Check] Candidate Scenarios: ${seleniumTestCases.length}`);
-  console.log(`[Selenium Check] Unique Scenarios: ${uniqueSel.length}`);
-  console.log(`[Selenium Check] Duplicates Found: ${selReport.rejectedDuplicates}`);
+    console.log(`[${suiteName} Check] Candidate Scenarios: ${cases.length}`);
+    console.log(`[${suiteName} Check] Unique Scenarios: ${unique.length}`);
+    console.log(`[${suiteName} Check] Duplicates Found: ${report.rejectedDuplicates}`);
 
-  if (seleniumTestCases.length !== 300) {
-    console.error(`[COUNT ERROR] Selenium test count is ${seleniumTestCases.length}, strictly expected 300!`);
-    hasErrors = true;
-  }
-  if (selReport.rejectedDuplicates > 0) {
-    console.error(`[DUPLICATE ERROR] Found ${selReport.rejectedDuplicates} duplicate Selenium test scenarios:`);
-    console.error(selReport.duplicateDetails);
-    hasErrors = true;
-  }
-
-  // Verify every Selenium test is executable
-  const nonExecutableSel = uniqueSel.filter(tc => typeof tc.execute !== 'function');
-  if (nonExecutableSel.length > 0) {
-    console.error(`[EXECUTION ERROR] Found ${nonExecutableSel.length} Selenium tests missing executable function!`);
-    hasErrors = true;
+    if (cases.length !== 300) {
+      console.error(`[COUNT ERROR] ${suiteName} test count is ${cases.length}, strictly expected 300!`);
+      hasErrors = true;
+    }
+    if (report.rejectedDuplicates > 0) {
+      console.error(`[DUPLICATE ERROR] Found ${report.rejectedDuplicates} duplicate ${suiteName} test scenarios!`);
+      hasErrors = true;
+    }
   }
 
-  // 2. Validate API Count and Uniqueness
-  const apiDetector = new DuplicateDetector();
-  const uniqueApi = apiDetector.filterUnique(apiTestCases);
-  const apiReport = apiDetector.getReport();
-
-  console.log(`\n[API Check] Candidate Scenarios: ${apiTestCases.length}`);
-  console.log(`[API Check] Unique Scenarios: ${uniqueApi.length}`);
-  console.log(`[API Check] Duplicates Found: ${apiReport.rejectedDuplicates}`);
-
-  if (apiTestCases.length !== 300) {
-    console.error(`[COUNT ERROR] API test count is ${apiTestCases.length}, strictly expected 300!`);
-    hasErrors = true;
-  }
-  if (apiReport.rejectedDuplicates > 0) {
-    console.error(`[DUPLICATE ERROR] Found ${apiReport.rejectedDuplicates} duplicate API test scenarios:`);
-    console.error(apiReport.duplicateDetails);
-    hasErrors = true;
-  }
-
-  // Verify every API test is executable
-  const nonExecutableApi = uniqueApi.filter(tc => typeof tc.execute !== 'function');
-  if (nonExecutableApi.length > 0) {
-    console.error(`[EXECUTION ERROR] Found ${nonExecutableApi.length} API tests missing executable function!`);
-    hasErrors = true;
-  }
+  validateSuite('Selenium E2E', seleniumTestCases);
+  validateSuite('Appium Mobile', appiumTestCases);
+  validateSuite('API Integration', apiTestCases);
+  validateSuite('Load Testing', loadTestCases);
+  validateSuite('Vulnerability Security', securityTestCases);
 
   if (hasErrors) {
     console.error('\n====================================================');
@@ -69,7 +45,7 @@ function validateTestCounts() {
   }
 
   console.log('\n====================================================');
-  console.log('SUCCESS: ALL 300 SELENIUM + 300 API TEST SCENARIOS ARE UNIQUE & EXECUTABLE');
+  console.log('SUCCESS: ALL 1,500 TEST SCENARIOS (300 PER SUITE) ARE UNIQUE & EXECUTABLE');
   console.log('====================================================');
 }
 

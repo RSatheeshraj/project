@@ -60,7 +60,8 @@ async function runMasterQaPipeline() {
     appiumResults: appiumOutput.executionResults,
     apiMetrics: apiOutput.metrics,
     apiResults: apiOutput.executionResults,
-    loadResults: loadOutput,
+    loadMetrics: loadOutput.metrics,
+    loadResults: loadOutput.executionResults,
     securityMetrics: secOutput.metrics,
     securityResults: secOutput.securityResults
   };
