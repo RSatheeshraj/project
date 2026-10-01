@@ -34,6 +34,68 @@ class AiResultScreen extends StatelessWidget {
     }
   }
 
+  Widget _buildFieldRow(
+    BuildContext context, {
+    required String label,
+    required String value,
+    required IconData icon,
+    required Color iconBgColor,
+  }) {
+    final theme = Theme.of(context);
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconBgColor,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 18, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: Colors.grey.shade700,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCard(
     BuildContext context, {
     required String title,
@@ -81,6 +143,7 @@ class AiResultScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final severityColor = _severityColor(result.severity);
+    final trainedResult = result.trainedAiResult;
 
     return Scaffold(
       appBar: AppBar(
@@ -109,8 +172,29 @@ class AiResultScreen extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // FINAL RESULT Banner Header (Matching AI SCAN.png)
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E293B),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Center(
+                child: Text(
+                  'FINAL RESULT (SHOW TO FARMER)',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
             // Image Preview
             if (imageFile != null || (imageUrl != null && imageUrl!.isNotEmpty))
               ClipRRect(
@@ -118,19 +202,19 @@ class AiResultScreen extends StatelessWidget {
                 child: imageFile != null
                     ? Image.file(
                         imageFile!,
-                        height: 200,
+                        height: 220,
                         width: double.infinity,
                         fit: BoxFit.cover,
                       )
                     : Image.network(
                         imageUrl!,
-                        height: 200,
+                        height: 220,
                         width: double.infinity,
                         fit: BoxFit.cover,
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Container(
-                            height: 200,
+                            height: 220,
                             width: double.infinity,
                             color: Colors.grey.shade200,
                             child: const Center(
@@ -140,7 +224,7 @@ class AiResultScreen extends StatelessWidget {
                         },
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
-                            height: 200,
+                            height: 220,
                             width: double.infinity,
                             color: Colors.grey.shade200,
                             child: const Center(
@@ -168,9 +252,46 @@ class AiResultScreen extends StatelessWidget {
                   ),
                 ),
               ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // Header: Disease Name and Badges
+            // Trained AI Model Status Badge (if available)
+            if (trainedResult != null) ...[
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: trainedResult.isSuccess ? Colors.green.shade50 : Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: trainedResult.isSuccess ? Colors.green.shade300 : Colors.red.shade300,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      trainedResult.isSuccess ? Icons.check_circle : Icons.warning_amber_rounded,
+                      size: 16,
+                      color: trainedResult.isSuccess ? Colors.green.shade700 : Colors.red.shade700,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        trainedResult.isSuccess
+                            ? 'Trained AI Model: Identified ${trainedResult.diseaseName} (${trainedResult.confidence.toStringAsFixed(2)}%)'
+                            : 'Trained AI Model: Low Confidence (Proceeded to Gemini)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: trainedResult.isSuccess ? Colors.green.shade800 : Colors.red.shade800,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+
+            // Disease Name & Severity / Confidence badges
             Text(
               result.diseaseName,
               style: theme.textTheme.headlineSmall?.copyWith(
@@ -244,19 +365,61 @@ class AiResultScreen extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
+
+            // Structured Result Fields (Matching AI SCAN.png bottom panel)
+            _buildFieldRow(
+              context,
+              label: 'Disease / Condition',
+              value: result.diseaseName,
+              icon: Icons.coronavirus_rounded,
+              iconBgColor: Colors.purple.shade600,
+            ),
+            _buildFieldRow(
+              context,
+              label: 'Confidence',
+              value: '${result.confidence}% (${result.severity} Severity)',
+              icon: Icons.speed_rounded,
+              iconBgColor: Colors.orange.shade700,
+            ),
+            _buildFieldRow(
+              context,
+              label: 'Symptoms',
+              value: result.symptoms.isNotEmpty
+                  ? result.symptoms
+                  : 'Observed clinical signs in affected birds',
+              icon: Icons.medical_information_rounded,
+              iconBgColor: Colors.green.shade600,
+            ),
+            _buildFieldRow(
+              context,
+              label: 'Prevention',
+              value: result.prevention.isNotEmpty
+                  ? result.prevention
+                  : 'Maintain biosecurity, sanitation and proper flock management.',
+              icon: Icons.shield_rounded,
+              iconBgColor: Colors.blue.shade600,
+            ),
+            _buildFieldRow(
+              context,
+              label: 'Recommendation',
+              value: result.recommendation.isNotEmpty
+                  ? result.recommendation
+                  : (result.immediateAction.isNotEmpty
+                      ? result.immediateAction
+                      : 'Consult local veterinarian for supportive treatment.'),
+              icon: Icons.assignment_turned_in_rounded,
+              iconBgColor: Colors.red.shade600,
+            ),
 
             // Isolation Badge
-            if (result.isolationRequired)
+            if (result.isolationRequired) ...[
+              const SizedBox(height: 8),
               Container(
-                margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.critical.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: AppColors.critical),
                 ),
                 child: Row(
@@ -275,10 +438,11 @@ class AiResultScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ],
 
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
 
-            // Details Cards
+            // Detailed Cards
             _buildCard(
               context,
               title: 'Possible Cause',
@@ -301,14 +465,6 @@ class AiResultScreen extends StatelessWidget {
               content: result.treatment,
               icon: Icons.medical_services_rounded,
               color: Colors.blue,
-            ),
-            const SizedBox(height: 16),
-            _buildCard(
-              context,
-              title: 'Prevention',
-              content: result.prevention,
-              icon: Icons.shield_rounded,
-              color: Colors.green,
             ),
             const SizedBox(height: 48),
           ],

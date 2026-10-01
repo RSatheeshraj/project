@@ -134,6 +134,7 @@ class _AiResultPdfPreviewScreenState extends State<AiResultPdfPreviewScreen> {
     }
 
     pw.Widget buildSection({required String title, required String content}) {
+      if (content.isEmpty) return pw.SizedBox();
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
@@ -198,10 +199,12 @@ class _AiResultPdfPreviewScreenState extends State<AiResultPdfPreviewScreen> {
             pw.Divider(color: PdfColors.grey300),
             pw.SizedBox(height: 12),
 
+            buildSection(title: 'SYMPTOMS', content: widget.result.symptoms),
             buildSection(title: 'POSSIBLE CAUSE', content: widget.result.possibleCause),
             buildSection(title: 'IMMEDIATE ACTION', content: widget.result.immediateAction),
             buildSection(title: 'TREATMENT PLAN', content: widget.result.treatment),
             buildSection(title: 'PREVENTION', content: widget.result.prevention),
+            buildSection(title: 'RECOMMENDATIONS', content: widget.result.recommendation),
           ];
         },
       ),

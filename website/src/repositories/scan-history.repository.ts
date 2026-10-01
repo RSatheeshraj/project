@@ -63,18 +63,18 @@ function toScanHistory(id: string, data: Record<string, any>): ScanHistory {
 
 export const ScanHistoryRepository = {
   /**
-   * Returns all scan history for the current user, newest-first.
-   * Requires composite index: ownerId (ASC) + createdAt (DESC).
+   * Returns all scan history for the current user, newest-first (in-memory,
+   * matching FarmRepository strategy to avoid composite index requirement).
    */
   async getScanHistory(): Promise<ScanHistory[]> {
     const uid = requireUid();
     const q = query(
       scanHistoryCol(),
-      where('ownerId', '==', uid),
-      orderBy('createdAt', 'desc')
+      where('ownerId', '==', uid)
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => toScanHistory(d.id, d.data() as unknown as Record<string, unknown>));
+    const scans = snap.docs.map((d) => toScanHistory(d.id, d.data() as unknown as Record<string, unknown>));
+    return scans.sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0));
   },
 
   /** Subscribes to real-time scan history updates. */
@@ -86,11 +86,11 @@ export const ScanHistoryRepository = {
     }
     const q = query(
       scanHistoryCol(),
-      where('ownerId', '==', uid),
-      orderBy('createdAt', 'desc')
+      where('ownerId', '==', uid)
     );
     return onSnapshot(q, (snap) => {
-      callback(snap.docs.map((d) => toScanHistory(d.id, d.data() as unknown as Record<string, unknown>)));
+      const scans = snap.docs.map((d) => toScanHistory(d.id, d.data() as unknown as Record<string, unknown>));
+      callback(scans.sort((a, b) => (b.createdAt?.getTime() ?? 0) - (a.createdAt?.getTime() ?? 0)));
     });
   },
 

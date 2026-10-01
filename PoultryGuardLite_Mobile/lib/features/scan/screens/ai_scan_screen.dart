@@ -12,6 +12,9 @@ import '../../flock/providers/batch_provider.dart';
 import '../../flock/providers/farm_provider.dart';
 import '../providers/ai_scan_provider.dart';
 import '../providers/scan_history_provider.dart';
+import '../services/trained_ai_model_service.dart';
+import '../widgets/gemini_api_loading_dialog.dart';
+import '../widgets/trained_ai_popup_dialog.dart';
 import 'ai_result_screen.dart';
 
 class AiScanScreen extends ConsumerStatefulWidget {
@@ -69,14 +72,29 @@ class _AiScanScreenState extends ConsumerState<AiScanScreen> {
     if (pickedFile == null) return;
     final imageFile = File(pickedFile.path);
 
-    // Show loading
-    if (mounted) {
-      UiHelpers.showLoadingDialog(
-        context,
-        'Analyzing...',
-        'Gemini AI is examining the image along with flock context.',
-      );
-    }
+    // ── 1. TRAINED AI MODEL (Image Analysis) ──────────────────────────────────
+    final trainedResult = await TrainedAiModelService().analyzeImage(imageFile);
+
+    if (!mounted) return;
+
+    // ── 2. POPUP MESSAGE (SUCCESS ✓ / FAILED ✗) ──────────────────────────────
+    final shouldProceed = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogCtx) => TrainedAiPopupDialog(
+        result: trainedResult,
+        onContinue: () => Navigator.of(dialogCtx).pop(true),
+      ),
+    );
+
+    if (shouldProceed != true || !mounted) return;
+
+    // ── 3. GEMINI API (ALWAYS RUN) ────────────────────────────────────────────
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => const GeminiApiLoadingDialog(),
+    );
 
     final result = await ref
         .read(aiScanControllerProvider.notifier)
@@ -84,12 +102,14 @@ class _AiScanScreenState extends ConsumerState<AiScanScreen> {
           farm: _selectedFarm!,
           batch: _selectedBatch!,
           imageFile: imageFile,
+          trainedAiResult: trainedResult,
         );
 
     if (mounted) {
-      context.pop(); // dismiss loading
+      Navigator.of(context, rootNavigator: true).pop(); // dismiss loading dialog
     }
 
+    // ── 4. FINAL RESULT (SHOW TO FARMER) ──────────────────────────────────────
     if (result != null) {
       if (mounted) {
         Navigator.push(
@@ -327,7 +347,7 @@ class _AiScanScreenState extends ConsumerState<AiScanScreen> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         subtitle: Text(
-                          '${item.farmName} • ${item.batchName}\\n${item.createdAt != null ? DateFormat("MMM d, yyyy").format(item.createdAt!) : ''}',
+                          '${item.farmName} • ${item.batchName}\n${item.createdAt != null ? DateFormat("MMM d, yyyy").format(item.createdAt!) : ''}',
                           style: tt.bodySmall,
                         ),
                         trailing: Icon(

@@ -12,6 +12,16 @@ export async function POST(request: NextRequest) {
     const farmId = formData.get('farmId') as string | null;
     const batchId = formData.get('batchId') as string | null;
     const uid = formData.get('uid') as string | null;
+    const farmName = (formData.get('farmName') as string | null) || undefined;
+    const batchName = (formData.get('batchName') as string | null) || undefined;
+    const birdType = (formData.get('birdType') as string | null) || undefined;
+    const rawTotalBirds = formData.get('totalBirds') as string | null;
+    const totalBirds = rawTotalBirds ? parseInt(rawTotalBirds, 10) : undefined;
+    const arrivalDate = (formData.get('arrivalDate') as string | null) || undefined;
+    const analysisType = (formData.get('analysisType') as string | null) || undefined;
+    const trainedDisease = (formData.get('trainedDisease') as string | null) || undefined;
+    const rawConfidence = formData.get('trainedConfidence') as string | null;
+    const trainedConfidence = rawConfidence ? parseFloat(rawConfidence) : undefined;
 
     if (!image || !farmId || !batchId || !uid) {
       return NextResponse.json({ error: 'Missing required fields in form data.' }, { status: 400 });
@@ -26,17 +36,20 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
     const base64 = buffer.toString('base64');
 
-    // 2. Fetch context & compute analytics
-    let context;
-    try {
-      context = await AnalyticsService.getFlockContext(farmId, batchId);
-    } catch (e) {
-      console.error('[ai-scan] Error fetching flock context:', e);
-      return NextResponse.json({ error: 'Could not load farm or batch data.' }, { status: 404 });
-    }
+    // 2. Fetch context & compute analytics (with fallback support)
+    const context = await AnalyticsService.getFlockContext(farmId, batchId, {
+      farmName,
+      batchName,
+      birdType,
+      totalBirds,
+      arrivalDate,
+    });
 
-    // 3. Build Prompt
-    const prompt = AiPromptService.buildPrompt(context);
+    // 3. Build Prompt (incorporates trained model preliminary result if provided)
+    const prompt = AiPromptService.buildPrompt(context, {
+      trainedDisease,
+      trainedConfidence,
+    });
 
     // 4. Call Gemini Vision
     let result;
@@ -56,11 +69,13 @@ export async function POST(request: NextRequest) {
         farmName: context.farmName,
         batchName: context.batchName,
         result,
+        analysisType,
+        trainedDisease,
+        trainedConfidence,
       });
     } catch (e) {
-      console.error('[ai-scan] Firestore write error:', e);
-      // Return result anyway - don't fail the whole scan for a save error
-      return NextResponse.json({ result, warning: 'Scan completed but failed to save to history.' }, { status: 207 });
+      console.warn('[ai-scan] Server-side history write skipped (handled by client):', e);
+      return NextResponse.json({ result }, { status: 200 });
     }
 
     // 6. Return Result

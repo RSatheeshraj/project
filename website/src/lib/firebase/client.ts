@@ -9,13 +9,13 @@
 import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCUsKqEa2xlGlfCHY0MQVAGca58y7mAsSU',
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'poultryguardlite.firebaseapp.com',
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'poultryguardlite',
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'poultryguardlite.firebasestorage.app',
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1013031899395',
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1013031899395:web:4eb9d406fa42f6f9ca1936',
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || 'G-M84WJKKCHG',
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyCAv3VoRXAxnI6HAgbpYhYmECtHJA0MjLk',
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'poultryguardlite-435d9.firebaseapp.com',
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'poultryguardlite-435d9',
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'poultryguardlite-435d9.firebasestorage.app',
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1050344579652',
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1050344579652:web:4f86bd6b3d9e00a9661211',
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || 'G-85CB46ZV2K',
 };
 
 // Prevent duplicate initialization during Next.js hot-reloads.

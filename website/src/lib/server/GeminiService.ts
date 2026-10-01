@@ -7,51 +7,68 @@ export class GeminiService {
       throw new Error('AI service is not configured. Contact support.');
     }
 
-    const geminiModel = 'gemini-3.6-flash';
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`;
-
-    const geminiPayload = {
-      contents: [
-        {
-          parts: [
-            { text: prompt },
-            {
-              inline_data: {
-                mime_type: imageMimeType,
-                data: imageBase64,
-              },
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        responseMimeType: 'application/json',
-      },
-    };
+    const candidateModels = [
+      process.env.GEMINI_MODEL || 'gemini-3.8-flash',
+      'gemini-3.6-flash',
+      'gemini-3.5-flash',
+    ];
 
     let response: Response | null = null;
-    let attempts = 0;
-    const maxAttempts = 3;
+    let lastError: Error | null = null;
 
-    while (attempts < maxAttempts) {
-      attempts++;
-      try {
-        response = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(geminiPayload),
-          signal: AbortSignal.timeout(60_000),
-        });
+    for (const geminiModel of candidateModels) {
+      const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${apiKey}`;
 
-        if (response.status !== 503 && response.status !== 504) {
-          break; // Exit retry loop on success or non-retriable error
+      const geminiPayload = {
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              {
+                inline_data: {
+                  mime_type: imageMimeType,
+                  data: imageBase64,
+                },
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: 'application/json',
+        },
+      };
+
+      let attempts = 0;
+      const maxAttempts = 2;
+
+      while (attempts < maxAttempts) {
+        attempts++;
+        try {
+          response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(geminiPayload),
+            signal: AbortSignal.timeout(60_000),
+          });
+
+          if (response.ok) {
+            break; // Success!
+          }
+
+          if (response.status !== 503 && response.status !== 504 && response.status !== 429) {
+            break; // Non-retriable error for this model, try next candidate
+          }
+        } catch (err) {
+          lastError = err instanceof Error ? err : new Error(String(err));
         }
-      } catch (err) {
-        if (attempts >= maxAttempts) throw err;
+
+        if (attempts < maxAttempts) {
+          await new Promise((res) => setTimeout(res, 1000 * attempts));
+        }
       }
-      
-      if (attempts < maxAttempts) {
-        await new Promise((res) => setTimeout(res, 1000 * attempts));
+
+      if (response && response.ok) {
+        break; // Successfully got a 200 response
       }
     }
 

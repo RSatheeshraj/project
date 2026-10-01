@@ -9,6 +9,14 @@ export interface AiScanInput {
   file: File;
   farmId: string;
   batchId: string;
+  farmName?: string;
+  batchName?: string;
+  birdType?: string;
+  totalBirds?: number;
+  arrivalDate?: string;
+  analysisType?: 'picture_analysis' | 'disease_analysis';
+  trainedDisease?: string;
+  trainedConfidence?: number;
 }
 
 export interface AiScanOutput {
@@ -26,6 +34,30 @@ async function runAiScan(input: AiScanInput): Promise<AiScanOutput> {
   formData.append('farmId', input.farmId);
   formData.append('batchId', input.batchId);
   formData.append('uid', uid);
+  if (input.farmName) {
+    formData.append('farmName', input.farmName);
+  }
+  if (input.batchName) {
+    formData.append('batchName', input.batchName);
+  }
+  if (input.birdType) {
+    formData.append('birdType', input.birdType);
+  }
+  if (input.totalBirds !== undefined) {
+    formData.append('totalBirds', input.totalBirds.toString());
+  }
+  if (input.arrivalDate) {
+    formData.append('arrivalDate', input.arrivalDate);
+  }
+  if (input.analysisType) {
+    formData.append('analysisType', input.analysisType);
+  }
+  if (input.trainedDisease) {
+    formData.append('trainedDisease', input.trainedDisease);
+  }
+  if (input.trainedConfidence !== undefined) {
+    formData.append('trainedConfidence', input.trainedConfidence.toString());
+  }
 
   console.log('[useAiScan] Sending POST to /api/ai-scan with FormData...');
 

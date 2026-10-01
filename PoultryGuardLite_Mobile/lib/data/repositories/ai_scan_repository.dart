@@ -8,6 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/errors/app_exceptions.dart';
 import '../../features/scan/models/ai_scan_result_model.dart';
+import '../../features/scan/models/trained_ai_result.dart';
 import '../../features/scan/services/ai_prompt_service.dart';
 
 final aiScanRepositoryProvider = Provider<AiScanRepository>((ref) {
@@ -15,33 +16,11 @@ final aiScanRepositoryProvider = Provider<AiScanRepository>((ref) {
 });
 
 /// Repository responsible for calling Gemini Vision AI via Firebase AI Logic.
-///
-/// Uses [firebase_ai] — the official Firebase package that authenticates
-/// securely via your Firebase project configuration. No client-side API key
-/// is required or used.
-///
-/// Public exception types exposed by [firebase_ai] v2.x:
-///   [InvalidApiKey]            — API key rejected by Google
-///   [UnsupportedUserLocation]  — region not supported
-///   [ServerException]          — generic server-side error (includes quota,
-///                                service-disabled, permission-denied)
-///   [FirebaseAIException]      — base class for all of the above
-///   [FirebaseAISdkException]   — SDK/format parsing bug
-///
-/// All of these are caught and converted to the typed [AiScanException].
 class AiScanRepository {
-  // ── Model configuration ───────────────────────────────────────────────
-  // gemini-3.6-flash: officially supported multimodal model for the latest Firebase AI Logic SDK.
-  // Supports text + image input with fast inference and high accuracy.
   static const _modelName = 'gemini-3.6-flash';
-
-  // ── Logging tag ──────────────────────────────────────────────────────────
   static const _tag = 'AiScanRepository';
 
   /// Calls Gemini Vision AI to analyze the image and flock context.
-  ///
-  /// Throws [AiScanException] for all expected failure modes. The original
-  /// exception is preserved in [AiScanException.cause] for debugging.
   Future<AiScanResultModel> analyzeImage({
     required File imageFile,
     required String farmName,
@@ -56,10 +35,9 @@ class AiScanRepository {
     required double humidity,
     required String vaccination,
     required String medicine,
+    TrainedAiResult? trainedAiResult,
   }) async {
     // ── 1. Build the generative model ────────────────────────────────────────
-    // FirebaseAI.googleAI() targets the Gemini Developer API backend.
-    // No API key needed client-side; Firebase uses your project config.
     final model = FirebaseAI.googleAI().generativeModel(
       model: _modelName,
       generationConfig: GenerationConfig(responseMimeType: 'application/json'),
@@ -81,6 +59,9 @@ class AiScanRepository {
       humidity: humidity,
       vaccination: vaccination,
       medicine: medicine,
+      trainedModelDisease: trainedAiResult?.isSuccess == true
+          ? '${trainedAiResult!.diseaseName} (${trainedAiResult.confidence}%)'
+          : null,
     );
 
     developer.log(
@@ -109,12 +90,10 @@ class AiScanRepository {
       throw const AiScanException('The selected image appears to be empty.');
     }
 
-    // Detect MIME type from magic bytes (JPEG/PNG/GIF/WebP; fallback JPEG).
     final mimeType = _detectMimeType(imageBytes);
 
     developer.log(
-      '[$_tag] Image loaded — ${imageBytes.lengthInBytes} bytes, '
-      'mime: $mimeType',
+      '[$_tag] Image loaded — ${imageBytes.lengthInBytes} bytes, mime: $mimeType',
       name: _tag,
     );
 
@@ -154,14 +133,18 @@ class AiScanRepository {
       }
 
       // ── 7. Safe JSON parsing ───────────────────────────────────────────────
-      return _parseResponse(text);
+      final parsedResult = _parseResponse(text);
+      
+      // Attach the trained AI model result to the parsed Gemini result
+      if (trainedAiResult != null) {
+        return parsedResult.copyWith(trainedAiResult: trainedAiResult);
+      }
+      return parsedResult;
 
       // ── Error handling ─────────────────────────────────────────────────────
     } on AiScanException {
-      rethrow; // Already a domain exception — let it propagate as-is.
-
+      rethrow;
     } on InvalidApiKey catch (e, st) {
-      // firebase_ai exports InvalidApiKey directly.
       developer.log(
         '[$_tag] InvalidApiKey: ${e.message}',
         name: _tag,
@@ -173,9 +156,7 @@ class AiScanRepository {
         'and ensure the Gemini API is enabled in the Firebase console.',
         cause: e,
       );
-
     } on UnsupportedUserLocation catch (e, st) {
-      // firebase_ai exports UnsupportedUserLocation directly.
       developer.log(
         '[$_tag] UnsupportedUserLocation: ${e.message}',
         name: _tag,
@@ -187,10 +168,7 @@ class AiScanRepository {
         'Please check Firebase regional availability.',
         cause: e,
       );
-
     } on FirebaseAIException catch (e, st) {
-      // Covers ServerException (which wraps quota/service-disabled/permission),
-      // plus any other FirebaseAIException subclass not exported individually.
       developer.log(
         '[$_tag] FirebaseAIException (${e.runtimeType}): ${e.message}',
         name: _tag,
@@ -198,9 +176,7 @@ class AiScanRepository {
         stackTrace: st,
       );
       throw AiScanException(_mapFirebaseAiMessage(e.message), cause: e);
-
     } on FirebaseAISdkException catch (e, st) {
-      // SDK-level parsing bug — indicates a version mismatch.
       developer.log(
         '[$_tag] FirebaseAISdkException: ${e.message}',
         name: _tag,
@@ -211,7 +187,6 @@ class AiScanRepository {
         'Internal SDK error — please update the app and try again.',
         cause: e,
       );
-
     } on SocketException catch (e, st) {
       developer.log(
         '[$_tag] SocketException (no network): $e',
@@ -223,11 +198,7 @@ class AiScanRepository {
         'Network error — please check your internet connection and try again.',
         cause: e,
       );
-
     } catch (e, st) {
-      // Catch-all: logs the REAL exception + stack trace to the console so the
-      // developer can see it. This fixes the previous "\\$e" bug that hid
-      // the actual error message.
       developer.log(
         '[$_tag] Unexpected error during Gemini call.\n'
         'Type   : ${e.runtimeType}\n'
@@ -246,14 +217,8 @@ class AiScanRepository {
 
   // ── Private helpers ────────────────────────────────────────────────────────
 
-  /// Safely parses the Gemini JSON response into [AiScanResultModel].
-  ///
-  /// Strips markdown code fences if present, validates the root type,
-  /// and throws [AiScanException] (not raw [FormatException]) on failure.
   AiScanResultModel _parseResponse(String text) {
     try {
-      // Strip markdown code fences that some model responses include even when
-      // responseMimeType is set to application/json.
       final clean = text
           .replaceAll(RegExp(r'```json\s*', multiLine: true), '')
           .replaceAll(RegExp(r'```\s*', multiLine: true), '')
@@ -262,9 +227,7 @@ class AiScanRepository {
       final decoded = json.decode(clean);
 
       if (decoded is! Map<String, dynamic>) {
-        throw const FormatException(
-          'Expected a JSON object at the root level',
-        );
+        throw const FormatException('Expected a JSON object at the root level');
       }
 
       developer.log(
@@ -287,11 +250,6 @@ class AiScanRepository {
     }
   }
 
-  /// Maps a [FirebaseAIException.message] to a user-friendly description.
-  ///
-  /// [ServerException] wraps many HTTP errors (quota, permission, service
-  /// disabled) without separate exported subclasses in v2.3.0. We do a
-  /// best-effort match on the message string.
   String _mapFirebaseAiMessage(String message) {
     final lower = message.toLowerCase();
 
@@ -323,13 +281,9 @@ class AiScanRepository {
       return 'The Gemini service is temporarily overloaded. '
           'Please try again in a moment.';
     }
-    // Fallback: expose the raw message for debugging.
     return 'Gemini AI error: $message';
   }
 
-  /// Detects the image MIME type from magic bytes.
-  ///
-  /// Falls back to `image/jpeg` — the most common format from camera/gallery.
   String _detectMimeType(Uint8List bytes) {
     if (bytes.length >= 3 &&
         bytes[0] == 0xFF &&
@@ -339,31 +293,28 @@ class AiScanRepository {
     }
     if (bytes.length >= 4 &&
         bytes[0] == 0x89 &&
-        bytes[1] == 0x50 && // 'P'
-        bytes[2] == 0x4E && // 'N'
+        bytes[1] == 0x50 &&
+        bytes[2] == 0x4E &&
         bytes[3] == 0x47) {
-      // 'G'
       return 'image/png';
     }
     if (bytes.length >= 6 &&
-        bytes[0] == 0x47 && // 'G'
-        bytes[1] == 0x49 && // 'I'
+        bytes[0] == 0x47 &&
+        bytes[1] == 0x49 &&
         bytes[2] == 0x46) {
-      // 'F'
       return 'image/gif';
     }
     if (bytes.length >= 12 &&
-        bytes[0] == 0x52 && // 'R'
-        bytes[1] == 0x49 && // 'I'
-        bytes[2] == 0x46 && // 'F'
-        bytes[3] == 0x46 && // 'F'
-        bytes[8] == 0x57 && // 'W'
-        bytes[9] == 0x45 && // 'E'
-        bytes[10] == 0x42 && // 'B'
+        bytes[0] == 0x52 &&
+        bytes[1] == 0x49 &&
+        bytes[2] == 0x46 &&
+        bytes[3] == 0x46 &&
+        bytes[8] == 0x57 &&
+        bytes[9] == 0x45 &&
+        bytes[10] == 0x42 &&
         bytes[11] == 0x50) {
-      // 'P'
       return 'image/webp';
     }
-    return 'image/jpeg'; // Safe default for camera/gallery output.
+    return 'image/jpeg';
   }
 }

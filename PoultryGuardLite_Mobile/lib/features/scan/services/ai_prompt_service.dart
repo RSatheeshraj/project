@@ -13,7 +13,12 @@ class AiPromptService {
     required double humidity,
     required String vaccination,
     required String medicine,
+    String? trainedModelDisease,
   }) {
+    final trainedContext = (trainedModelDisease != null && trainedModelDisease.isNotEmpty)
+        ? '\n- Trained AI Model Preliminary Identification: $trainedModelDisease'
+        : '';
+
     return '''
 You are an expert poultry veterinarian AI. Analyze the uploaded image of poultry droppings, affected areas, or birds.
 
@@ -29,19 +34,21 @@ Here is the current context of the flock to help with your diagnosis:
 - Temperature: ${temperature.toStringAsFixed(1)}°C
 - Humidity: ${humidity.toStringAsFixed(1)}%
 - Vaccination History: ${vaccination.isEmpty ? 'None recorded' : vaccination}
-- Current Medicine: ${medicine.isEmpty ? 'None recorded' : medicine}
+- Current Medicine: ${medicine.isEmpty ? 'None recorded' : medicine}$trainedContext
 
 Based on the image and the provided flock context, diagnose the potential disease or health issue.
 
 Provide a raw JSON response (without markdown code blocks, just the JSON string) with the following exact keys:
 {
-  "diseaseName": "Name of the disease or issue",
+  "diseaseName": "Name of the disease or issue (e.g. Inclusion Body Hepatitis (IBH))",
   "confidence": 85, // Integer 0-100
   "severity": "High", // Must be one of: "Low", "Medium", "High", or "Critical"
+  "symptoms": "Key symptoms associated with this condition (comma separated)",
   "possibleCause": "Description of the likely cause considering the environment and image",
   "immediateAction": "What the farmer should do right now",
   "treatment": "Recommended treatment protocol",
   "prevention": "How to prevent this in the future",
+  "recommendation": "Key recommendations (e.g., Isolate affected birds, Consult veterinarian)",
   "isolationRequired": true // boolean
 }
 ''';

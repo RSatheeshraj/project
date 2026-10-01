@@ -1,0 +1,8 @@
+cocci
+healthy
+ncd
+pcrcocci
+pcrhealthy
+pcrncd
+pcrsalmo
+salmo

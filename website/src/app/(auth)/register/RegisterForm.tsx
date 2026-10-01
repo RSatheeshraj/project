@@ -83,7 +83,7 @@ export function RegisterForm() {
       });
       
       setSuccess(true);
-      setTimeout(() => router.replace('/dashboard'), 1500);
+      setTimeout(() => router.replace('/home'), 1500);
     } catch (err) {
       if (err instanceof AuthError) {
         setAuthError(err.message);

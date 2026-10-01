@@ -46,12 +46,12 @@ class DefaultFirebaseOptions {
   // Source: Firebase Console → Project Settings → Web app
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCUsKqEa2xlGlfCHY0MQVAGca58y7mAsSU',
-    authDomain: 'poultryguardlite.firebaseapp.com',
-    appId: '1:1013031899395:web:4eb9d406fa42f6f9ca1936',
-    messagingSenderId: '1013031899395',
-    projectId: 'poultryguardlite',
-    storageBucket: 'poultryguardlite.appspot.com',
-    measurementId: 'G-M84WJKKCHG',
+    apiKey: 'AIzaSyCAv3VoRXAxnI6HAgbpYhYmECtHJA0MjLk',
+    authDomain: 'poultryguardlite-435d9.firebaseapp.com',
+    appId: '1:1050344579652:web:4f86bd6b3d9e00a9661211',
+    messagingSenderId: '1050344579652',
+    projectId: 'poultryguardlite-435d9',
+    storageBucket: 'poultryguardlite-435d9.firebasestorage.app',
+    measurementId: 'G-85CB46ZV2K',
   );
 }

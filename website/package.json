@@ -14,7 +14,8 @@
     "test:load": "node tests/load/loadRunner.js",
     "test:security": "node tests/security/securityRunner.js",
     "test:report": "node tests/utils/generateExcelReport.js",
-    "test:all": "node scripts/run-master-qa.js"
+    "test:all": "node scripts/run-master-qa.js",
+    "seed": "node scripts/seed-database.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.4.0",
@@ -34,6 +35,8 @@
     "@radix-ui/react-toast": "^1.2.22",
     "@tanstack/react-query": "^5.101.4",
     "@tanstack/react-query-devtools": "^5.101.4",
+    "@tensorflow/tfjs": "^4.22.0",
+    "@tensorflow/tfjs-tflite": "^0.0.1-alpha.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.4.0",

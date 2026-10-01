@@ -10,9 +10,12 @@ export class ScanHistoryService {
     farmName: string;
     batchName: string;
     result: AiScanResult;
+    analysisType?: string;
+    trainedDisease?: string;
+    trainedConfidence?: number;
   }): Promise<void> {
     const db = getAdminDb();
-    await db.collection('scan_history').add({
+    const docData: Record<string, unknown> = {
       ownerId: data.uid,
       farmId: data.farmId,
       batchId: data.batchId,
@@ -30,6 +33,18 @@ export class ScanHistoryService {
       },
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
-    });
+    };
+
+    if (data.analysisType) {
+      docData.analysisType = data.analysisType;
+    }
+    if (data.trainedDisease) {
+      docData.trainedDisease = data.trainedDisease;
+    }
+    if (data.trainedConfidence !== undefined) {
+      docData.trainedConfidence = data.trainedConfidence;
+    }
+
+    await db.collection('scan_history').add(docData);
   }
 }

@@ -9,6 +9,7 @@ import '../../flock/providers/analytics_provider.dart';
 import '../../flock/providers/entry_provider.dart';
 import '../models/ai_scan_result_model.dart';
 import '../models/scan_history_model.dart';
+import '../models/trained_ai_result.dart';
 
 final aiScanControllerProvider =
     StateNotifierProvider<AiScanController, AsyncValue<AiScanResultModel?>>((
@@ -32,16 +33,15 @@ class AiScanController extends StateNotifier<AsyncValue<AiScanResultModel?>> {
   final AiScanRepository aiRepo;
   final ScanHistoryRepository historyRepo;
 
-
   Future<AiScanResultModel?> startScan({
     required FarmModel farm,
     required BatchModel batch,
     required File imageFile,
+    TrainedAiResult? trainedAiResult,
   }) async {
     try {
       state = const AsyncLoading();
 
-      // 2. Fetch context without new Firestore reads by using existing Riverpod providers
       // Extract latest vaccine/medicine from the entry stream
       final entries =
           await ref.read(entriesStreamProvider((farmId: farm.id, batchId: batch.id)).future);
@@ -52,7 +52,7 @@ class AiScanController extends StateNotifier<AsyncValue<AiScanResultModel?>> {
       final vaccination = latestEntry?.vaccination ?? '';
       final medicine = latestEntry?.medicine ?? '';
 
-      // 3. Analyze with Gemini
+      // Analyze with Gemini
       final result = await aiRepo.analyzeImage(
         imageFile: imageFile,
         farmName: farm.name,
@@ -67,29 +67,27 @@ class AiScanController extends StateNotifier<AsyncValue<AiScanResultModel?>> {
         humidity: analytics.latestHumidity,
         vaccination: vaccination,
         medicine: medicine,
+        trainedAiResult: trainedAiResult,
       );
-      // 4. Save to Scan History
-      // Generate ID first so we can use it for the image path
+
+      // Save to Scan History
       final scanId = historyRepo.generateScanId(farm.id, batch.id);
       
-      // Upload image
       String? imageUrl;
       try {
         imageUrl = await historyRepo.uploadScanImage(scanId, imageFile);
       } catch (e) {
-        // If image upload fails, log it but don't fail the whole scan saving
-        // The image will be missing, but the result is still valuable.
-        // Actually, user wants the image stored. We'll proceed but log the error.
+        // Continue saving record even if image upload fails
       }
 
       final scanHistory = ScanHistoryModel(
-        id: scanId, // Use generated ID
+        id: scanId,
         ownerId: '', // Added by repository
         farmId: farm.id,
         batchId: batch.id,
         farmName: farm.name,
         batchName: batch.batchName,
-        imageUrl: imageUrl, // Save the actual uploaded image URL
+        imageUrl: imageUrl,
         result: result,
       );
 
