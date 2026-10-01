@@ -1,38 +1,24 @@
 {
   "project_info": {
-    "project_number": "1013031899395",
-    "project_id": "poultryguardlite",
-    "storage_bucket": "poultryguardlite.firebasestorage.app"
+    "project_number": "1050344579652",
+    "project_id": "poultryguardlite-435d9",
+    "storage_bucket": "poultryguardlite-435d9.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1013031899395:android:aa8e6c62706c7428ca1936",
+        "mobilesdk_app_id": "1:1050344579652:android:aa8e6c62706c7428ca1936",
         "android_client_info": {
           "package_name": "com.kadhistudios.poultryguardlite"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "1013031899395-j5tdpki0316n7j649hcqes1a59g01u4o.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBAOZrRQRWMCBOX6nHPerrgp-HKFzZH5ko"
+          "current_key": "AIzaSyCAv3VoRXAxnI6HAgbpYhYmECtHJA0MjLk"
         }
       ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "1013031899395-j5tdpki0316n7j649hcqes1a59g01u4o.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
+      "services": {}
     }
   ],
   "configuration_version": "1"

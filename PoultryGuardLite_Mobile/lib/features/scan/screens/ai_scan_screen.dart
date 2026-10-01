@@ -193,7 +193,7 @@ class _AiScanScreenState extends ConsumerState<AiScanScreen> {
                 Consumer(
                   builder: (context, ref, child) {
                     final batchesAsync = ref.watch(
-                      batchesByFarmFromCacheProvider(_selectedFarm!.id),
+                      batchesByFarmStreamProvider(_selectedFarm!.id),
                     );
                     return batchesAsync.when(
                       data: (batches) {

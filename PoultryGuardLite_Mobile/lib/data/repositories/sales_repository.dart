@@ -36,9 +36,11 @@ class SalesRepository extends BaseFirestoreRepository<SalesModel> {
     if (uid == null) return Stream.value([]);
     
     return safeCollectionStream(
-      _sales(farmId, batchId).orderBy('date', descending: true).snapshots(),
+      _sales(farmId, batchId).snapshots(),
       'SalesRepository.watchSales',
-    );
+    ).map((sales) {
+      return sales..sort((a, b) => b.date.compareTo(a.date));
+    });
   }
 
   Future<void> addOrUpdateSale(

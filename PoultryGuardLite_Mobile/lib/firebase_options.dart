@@ -35,11 +35,12 @@ class DefaultFirebaseOptions {
   // Source: android/app/google-services.json
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBAOZrRQRWMCBOX6nHPerrgp-HKFzZH5ko',
-    appId: '1:1013031899395:android:aa8e6c62706c7428ca1936',
-    messagingSenderId: '1013031899395',
-    projectId: 'poultryguardlite',
-    storageBucket: 'poultryguardlite.appspot.com',
+    apiKey: 'AIzaSyCAv3VoRXAxnI6HAgbpYhYmECtHJA0MjLk',
+    appId: '1:1050344579652:web:4f86bd6b3d9e00a9661211',
+    messagingSenderId: '1050344579652',
+    projectId: 'poultryguardlite-435d9',
+    storageBucket: 'poultryguardlite-435d9.firebasestorage.app',
+    authDomain: 'poultryguardlite-435d9.firebaseapp.com',
   );
 
   // ── Web ──────────────────────────────────────────────────────────────────────

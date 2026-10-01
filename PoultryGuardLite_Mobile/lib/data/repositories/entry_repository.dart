@@ -70,9 +70,18 @@ class EntryRepository extends BaseFirestoreRepository<EntryModel> {
       _entries(
         farmId,
         batchId,
-      ).orderBy('entryDate', descending: true).snapshots(),
+      ).snapshots(),
       'EntryRepository.watchEntries[$farmId/$batchId]',
-    );
+    ).map((entries) {
+      return entries..sort((a, b) {
+        final aDate = a.entryDate;
+        final bDate = b.entryDate;
+        if (aDate == null && bDate == null) return 0;
+        if (aDate == null) return -1;
+        if (bDate == null) return 1;
+        return bDate.compareTo(aDate);
+      });
+    });
   }
 
   // ── Write Operations ──────────────────────────────────────────────────────

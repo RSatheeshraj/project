@@ -64,51 +64,93 @@ class BatchRepository extends BaseFirestoreRepository<BatchModel> {
     }
 
     return safeCollectionStream(
-      _batches(farmId).orderBy('createdAt', descending: true).snapshots(),
+      _batches(farmId).snapshots(),
       'BatchRepository.watchBatches[$farmId]',
-    );
+    ).map((batches) {
+      return batches..sort((a, b) {
+        final aDate = a.createdAt;
+        final bDate = b.createdAt;
+        if (aDate == null && bDate == null) return 0;
+        if (aDate == null) return -1;
+        if (bDate == null) return 1;
+        return bDate.compareTo(aDate);
+      });
+    });
   }
 
   /// Streams ALL batches across ALL farms for the current user.
-  Stream<List<BatchModel>> watchAllUserBatches() {
-  final uid = currentUserId;
+  Stream<List<BatchModel>> watchAllUserBatches() async* {
+    final uid = currentUserId;
 
-  if (uid == null) {
-    AppLogger.w(
-      '[BatchRepository] watchAllUserBatches called with no authenticated user.',
-    );
-    return Stream.value([]);
-  }
-
-  final rawStream = firestore
-      .collectionGroup('batches')
-      .where('ownerId', isEqualTo: uid)
-      .orderBy('createdAt', descending: true)
-      .snapshots();
-
-  return rawStream
-      .handleError((Object error, StackTrace stackTrace) {
-        AppLogger.e(
-          '[BatchRepository.watchAllUserBatches] Firestore stream error',
-          error: error,
-          stackTrace: stackTrace,
-        );
-        throw RepositoryException(
-          'Failed to load batches.',
-          cause: error,
-        );
-      })
-      .map(
-        (snapshot) => snapshot.docs
-            .map(
-              (doc) => BatchModel.fromMap(
-                doc.data(),
-                doc.id,
-              ),
-            )
-            .toList(),
+    if (uid == null) {
+      AppLogger.w(
+        '[BatchRepository] watchAllUserBatches called with no authenticated user.',
       );
-}
+      yield [];
+      return;
+    }
+
+    bool hasEmitted = false;
+    try {
+      final rawStream = firestore
+          .collectionGroup('batches')
+          .where('ownerId', isEqualTo: uid)
+          .snapshots();
+
+      await for (final snapshot in rawStream) {
+        hasEmitted = true;
+        final batches = snapshot.docs
+            .map((doc) => BatchModel.fromMap(doc.data(), doc.id))
+            .toList();
+        batches.sort((a, b) {
+          final aDate = a.createdAt;
+          final bDate = b.createdAt;
+          if (aDate == null && bDate == null) return 0;
+          if (aDate == null) return -1;
+          if (bDate == null) return 1;
+          return bDate.compareTo(aDate);
+        });
+        yield batches;
+      }
+    } catch (e) {
+      AppLogger.w(
+        '[BatchRepository.watchAllUserBatches] collectionGroup query error: $e. Falling back to per-farm batch query.',
+      );
+      if (!hasEmitted) {
+        try {
+          final farmDocs = await firestore
+              .collection('farms')
+              .where('ownerId', isEqualTo: uid)
+              .get();
+          final List<BatchModel> allBatches = [];
+          for (final f in farmDocs.docs) {
+            final bDocs = await firestore
+                .collection('farms')
+                .doc(f.id)
+                .collection('batches')
+                .get();
+            allBatches.addAll(
+              bDocs.docs.map((d) => BatchModel.fromMap(d.data(), d.id)),
+            );
+          }
+          allBatches.sort((a, b) {
+            final aDate = a.createdAt;
+            final bDate = b.createdAt;
+            if (aDate == null && bDate == null) return 0;
+            if (aDate == null) return -1;
+            if (bDate == null) return 1;
+            return bDate.compareTo(aDate);
+          });
+          yield allBatches;
+        } catch (fallbackError) {
+          AppLogger.e(
+            '[BatchRepository.watchAllUserBatches] Fallback failed: $fallbackError',
+          );
+          yield [];
+        }
+      }
+    }
+  }
 
   /// Streams a single batch document by [farmId] and [batchId].
   Stream<BatchModel?> watchBatch(String farmId, String batchId) {
